@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fit-repair.lib", "fit-repair.lib\fit-repair.lib.csproj", "{5257416F-4507-4AD8-A582-5A1C0F326561}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fit-repair", "fit-repair.webapp\fit-repair.csproj", "{14A5C11D-52A2-48D6-A5E5-C8A34F7BD1B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fit-repair.tests", "fit-repair.tests\fit-repair.tests.csproj", "{5FC01E37-D139-44AB-8531-1E7A8FC6A434}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5257416F-4507-4AD8-A582-5A1C0F326561}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5257416F-4507-4AD8-A582-5A1C0F326561}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5257416F-4507-4AD8-A582-5A1C0F326561}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5257416F-4507-4AD8-A582-5A1C0F326561}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14A5C11D-52A2-48D6-A5E5-C8A34F7BD1B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14A5C11D-52A2-48D6-A5E5-C8A34F7BD1B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14A5C11D-52A2-48D6-A5E5-C8A34F7BD1B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14A5C11D-52A2-48D6-A5E5-C8A34F7BD1B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FC01E37-D139-44AB-8531-1E7A8FC6A434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FC01E37-D139-44AB-8531-1E7A8FC6A434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FC01E37-D139-44AB-8531-1E7A8FC6A434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FC01E37-D139-44AB-8531-1E7A8FC6A434}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
