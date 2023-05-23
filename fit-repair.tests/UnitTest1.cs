@@ -2,6 +2,8 @@ namespace fit_repair.tests;
 
 public class UnitTest1
 {
+
+
     [Fact]
     public async void TestReadHeader()
     {
@@ -15,5 +17,18 @@ public class UnitTest1
         Assert.Equal(68052, header.DataSize);
 
         Assert.Equal(".FIT", header.DataType);
+    }
+
+
+    [Fact]
+    public async void TestReadRecords()
+    {
+        using FileStream reader = new("clean.fit", FileMode.Open, FileAccess.Read);
+        var parser = FitParser.Create(reader);
+
+        var header = await parser.ReadHeaderAsync();
+
+        parser.ReadRecords();
+
     }
 }
