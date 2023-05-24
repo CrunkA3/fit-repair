@@ -1,22 +1,29 @@
 public class FitFileHeader
 {
-    private readonly byte[] _data;
 
-    internal FitFileHeader(byte[] data)
+    internal FitFileHeader(int headerSize, int protocolVersion, short profileVersion, int dataSize, string dataType, short crc)
     {
-        _data = data;
+        HeaderSize = headerSize;
+        ProtocolVersion = protocolVersion;
+        ProfileVersion = profileVersion;
+        DataSize = dataSize;
+        DataType = dataType;
+        CRC = crc;
     }
-
 
     /// <summary>
     /// Indicates the length of this file header including header size. Minimum size is 12. This may be increased in future to add additional optional information
     /// </summary>
-    public int HeaderSize => _data[0];
+    public int HeaderSize { get; init; }
 
+    public int ProtocolVersion { get; init; }
 
-    public int ProtocolVersion => _data[1];
-    public short ProfileVersion => BitConverter.ToInt16(_data.AsSpan().Slice(2, 2));
-    public int DataSize => BitConverter.ToInt32(_data.AsSpan().Slice(4, 4));
-    public string DataType => System.Text.ASCIIEncoding.ASCII.GetString(_data.AsSpan().Slice(8, 4));
-    public short CRC => BitConverter.ToInt16(_data.AsSpan().Slice(12, 2));
+    public short ProfileVersion { get; init; }
+
+    public int DataSize { get; init; }
+
+    public string DataType { get; init; }
+
+    public short CRC { get; init; }
+
 }

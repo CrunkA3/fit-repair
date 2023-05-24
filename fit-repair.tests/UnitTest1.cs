@@ -28,7 +28,7 @@ public class UnitTest1
 
         var header = await parser.ReadHeaderAsync();
 
-        parser.ReadRecords();
+        await parser.ReadRecordsAsync();
 
     }
 }

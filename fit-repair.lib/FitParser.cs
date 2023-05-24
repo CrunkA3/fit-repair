@@ -3,7 +3,8 @@
 public class FitParser
 {
     private readonly Stream _stream;
-    private readonly Dictionary<short, DefinitionMessage> _definitionMessages = new();
+    private readonly Dictionary<int, DefinitionMessage> _definitionMessages = new();
+    private readonly Dictionary<int, DataMessage> _dataMessages = new();
 
     private FitParser(Stream stream)
     {
@@ -25,92 +26,136 @@ public class FitParser
         buff[0] = (byte)size;
 
         await _stream.ReadAsync(buff, 1, size - 1);
-        FitFileHeader header = new(buff);
+        FitFileHeader header = new(headerSize: buff[0],
+                                   protocolVersion: buff[1],
+                                   profileVersion: BitConverter.ToInt16(buff.AsSpan().Slice(2, 2)),
+                                   dataSize: BitConverter.ToInt32(buff.AsSpan().Slice(4, 4)),
+                                   dataType: System.Text.ASCIIEncoding.ASCII.GetString(buff.AsSpan().Slice(8, 4)),
+                                   crc: BitConverter.ToInt16(buff.AsSpan().Slice(12, 2)));
 
         return header;
     }
 
-    public async Task ReadRecords()
+    public async Task ReadRecordsAsync()
     {
         while (_stream.Position < _stream.Length)
         {
-            await ReadRecord();
+            await ReadRecordAsync();
         }
     }
 
-    private async Task ReadRecord()
+    private async Task ReadRecordAsync()
     {
         var headerByte = _stream.ReadByte();
 
-        var normalHeader = (headerByte & (1 << 7)) == 0;
-        var isDeveloper = (headerByte & (1 << 5)) != 0;
-        bool isDefinitionMessage = false;
-        short localMessageType;
+        var normalHeader = ((headerByte >> 7) & 1) == 0;
+        var isDeveloper = false;
+        var isDefinitionMessage = false;
+        int localMessageType;
+        int timeOffset = 0; //offset in seconds
 
-        //offset in seconds
-        short timeOffset = 0;
 
         if (normalHeader)
         {
             isDefinitionMessage = (headerByte & (1 << 6)) != 0;
+            isDeveloper = ((headerByte >> 5) & 1) != 0;
 
             // 0 = Record
             // 1 = Lap
-            localMessageType = Convert.ToInt16(string.Join(null, Enumerable.Range(0, 3).Reverse().Select(m => headerByte & (1 << m))), 2);
+            localMessageType = (headerByte >> 1) & 1;
         }
         else
         {
-            localMessageType = Convert.ToInt16(string.Join(null, Enumerable.Range(5, 6).Reverse().Select(m => headerByte & (1 << m))), 2);
-            timeOffset = Convert.ToInt16(string.Join(null, Enumerable.Range(0, 4).Reverse().Select(m => headerByte & (1 << m))), 2);
+            localMessageType = (headerByte >> 1) & 3;
+            timeOffset = (headerByte >> 0) & 15;
         }
 
         if (isDefinitionMessage)
         {
-            await ReadDefinitionMessage(localMessageType, isDeveloper);
+            await ReadDefinitionMessageAsync(localMessageType, isDeveloper);
+        }
+        else
+        {
+            await ReadDataMessageAsync(localMessageType);
         }
     }
 
-    private async Task ReadDefinitionMessage(short localMessageType, bool isDeveloper)
+    private async Task ReadDefinitionMessageAsync(int localMessageType, bool isDeveloper)
     {
-        DefinitionMessage definitionMessage = new();
         var buff = new byte[5];
         await _stream.ReadExactlyAsync(buff, 0, buff.Length);
 
-        definitionMessage.Reserved = buff[0];
-        definitionMessage.Architecture = (Architecture)buff[1];
-        definitionMessage.GlobalMessageNumber = BitConverter.ToUInt16(buff.AsSpan());
-        definitionMessage.FieldCount = buff[4];
+        var reserved = buff[0];
+        var architecture = (Architecture)buff[1];
+        var globalMessageNumber = BitConverter.ToUInt16(buff.AsSpan());
+        var fieldCount = buff[4];
 
-        var fieldsBuff = new byte[definitionMessage.FieldCount * 3];
+        var fieldsBuff = new byte[fieldCount * 3];
         await _stream.ReadExactlyAsync(fieldsBuff, 0, fieldsBuff.Length);
 
-        for (int i = 0; i < definitionMessage.FieldCount; i++)
+        var fieldDefinition = new FieldDefinition[fieldCount];
+        for (int i = 0; i < fieldCount; i++)
         {
             var fieldBuff = new byte[3];
             await _stream.ReadExactlyAsync(fieldBuff, 0, fieldBuff.Length);
-            //TODO: Read Field Definitions
+            fieldDefinition[i] = new FieldDefinition(number: fieldBuff[0],
+                                                     size: fieldBuff[1],
+                                                     baseType: fieldBuff[2]);
         }
 
 
-
+        var developerFieldCount = 0;
+        DeveloperFieldDefinition[]? developerFieldDefinitions = default;
         if (isDeveloper)
         {
-            definitionMessage.DeveloperFieldCount = _stream.ReadByte();
-            var devFieldsBuff = new byte[definitionMessage.DeveloperFieldCount * 3];
+            developerFieldCount = _stream.ReadByte();
+            developerFieldDefinitions = new DeveloperFieldDefinition[developerFieldCount];
+
+            var devFieldsBuff = new byte[developerFieldCount * 3];
             await _stream.ReadExactlyAsync(devFieldsBuff, 0, devFieldsBuff.Length);
 
-            for (int i = 0; i < definitionMessage.DeveloperFieldCount; i++)
+            for (int i = 0; i < developerFieldCount; i++)
             {
                 var fieldBuff = new byte[3];
                 await _stream.ReadExactlyAsync(fieldBuff, 0, fieldBuff.Length);
-                //TODO: Read Field Definitions
-
+                developerFieldDefinitions[i] = new DeveloperFieldDefinition(number: fieldBuff[0],
+                                                                            size: fieldBuff[1],
+                                                                            developerDataIndex: fieldBuff[2]);
             }
         }
 
+        DefinitionMessage definitionMessage = new(reserved, architecture, globalMessageNumber, fieldCount, developerFieldCount, fieldDefinition, developerFieldDefinitions);
         Console.WriteLine(definitionMessage.GlobalMessageNumber);
 
         _definitionMessages.Add(localMessageType, definitionMessage);
     }
 
+    private async Task ReadDataMessageAsync(int localMessageType)
+    {
+        if (!_definitionMessages.TryGetValue(localMessageType, out DefinitionMessage? definitionMessage))
+            throw new Exception(string.Format("Definition message for message type {0} not found", localMessageType));
+
+        for (int i = 0; i < definitionMessage.FieldCount; i++)
+        {
+            var field = definitionMessage.FieldDefinitions[i];
+            var buff = new byte[field.Size];
+            await _stream.ReadExactlyAsync(buff, 0, buff.Length);
+            if (definitionMessage.Architecture == Architecture.BigEndian) buff = buff.Reverse().ToArray();
+
+            //TODO: Save data
+        }
+
+        if (definitionMessage.DeveloperFieldCount > 0 && definitionMessage.DeveloperFieldDefinitions != null)
+        {
+            for (int i = 0; i < definitionMessage.FieldCount; i++)
+            {
+                var field = definitionMessage.DeveloperFieldDefinitions[i];
+                var buff = new byte[field.Size];
+                await _stream.ReadExactlyAsync(buff, 0, buff.Length);
+                if (definitionMessage.Architecture == Architecture.BigEndian) buff = buff.Reverse().ToArray();
+
+                //TODO: Save data
+            }
+        }
+    }
 }

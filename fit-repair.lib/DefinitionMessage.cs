@@ -1,8 +1,29 @@
 public class DefinitionMessage
 {
-    public int Reserved { get; internal set; }
-    public Architecture Architecture { get; internal set; }
-    public ushort GlobalMessageNumber { get; internal set; }
-    public int FieldCount { get; internal set; }
-    public int DeveloperFieldCount { get; internal set; }
+    internal DefinitionMessage(int reserved,
+                               Architecture architecture,
+                               ushort globalMessageNumber,
+                               int fieldCount,
+                               int developerFieldCount,
+                               FieldDefinition[] fieldDefinitions,
+                               DeveloperFieldDefinition[]? developerFieldDefinitions)
+    {
+        Reserved = reserved;
+        Architecture = architecture;
+        GlobalMessageNumber = globalMessageNumber;
+        FieldCount = fieldCount;
+        DeveloperFieldCount = developerFieldCount;
+        FieldDefinitions = fieldDefinitions;
+        DeveloperFieldDefinitions = developerFieldDefinitions;
+    }
+
+    public int Reserved { get; init; }
+    public Architecture Architecture { get; init; }
+    public ushort GlobalMessageNumber { get; init; }
+    public int FieldCount { get; init; }
+    public int DeveloperFieldCount { get; init; }
+
+
+    public FieldDefinition[] FieldDefinitions { get; init; }
+    public DeveloperFieldDefinition[]? DeveloperFieldDefinitions { get; init; }
 }
