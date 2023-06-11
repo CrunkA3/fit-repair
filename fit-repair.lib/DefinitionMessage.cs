@@ -17,13 +17,13 @@ public class DefinitionMessage
         DeveloperFieldDefinitions = developerFieldDefinitions;
     }
 
-    public int Reserved { get; init; }
-    public Architecture Architecture { get; init; }
-    public ushort GlobalMessageNumber { get; init; }
-    public int FieldCount { get; init; }
-    public int DeveloperFieldCount { get; init; }
+    public int Reserved { get; private init; }
+    public Architecture Architecture { get; private init; }
+    public ushort GlobalMessageNumber { get; private init; }
+    public int FieldCount { get; private init; }
+    public int DeveloperFieldCount { get; private init; }
 
 
     public FieldDefinition[] FieldDefinitions { get; init; }
-    public DeveloperFieldDefinition[]? DeveloperFieldDefinitions { get; init; }
+    public DeveloperFieldDefinition[]? DeveloperFieldDefinitions { get; private init; }
 }

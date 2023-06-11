@@ -1,7 +1,7 @@
 public class FitFileHeader
 {
 
-    internal FitFileHeader(int headerSize, int protocolVersion, short profileVersion, int dataSize, string dataType, short crc)
+    internal FitFileHeader(uint headerSize, byte protocolVersion, ushort profileVersion, uint dataSize, string dataType, ushort crc)
     {
         HeaderSize = headerSize;
         ProtocolVersion = protocolVersion;
@@ -14,16 +14,16 @@ public class FitFileHeader
     /// <summary>
     /// Indicates the length of this file header including header size. Minimum size is 12. This may be increased in future to add additional optional information
     /// </summary>
-    public int HeaderSize { get; init; }
+    public uint HeaderSize { get; init; }
 
-    public int ProtocolVersion { get; init; }
+    public byte ProtocolVersion { get; init; }
 
-    public short ProfileVersion { get; init; }
+    public ushort ProfileVersion { get; init; }
 
-    public int DataSize { get; init; }
+    public uint DataSize { get; init; }
 
     public string DataType { get; init; }
 
-    public short CRC { get; init; }
+    public ushort CRC { get; init; }
 
 }

@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\fit-repair.lib\fit-repair.lib.csproj" />
+    <None Update="activity.fit" CopyToOutputDirectory="PreserveNewest" />
     <None Update="clean.fit" CopyToOutputDirectory="PreserveNewest" />
     <None Update="corrupt.fit" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

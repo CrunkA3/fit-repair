@@ -4,14 +4,21 @@ public class FieldDefinition
     {
         Number = number;
         Size = size;
-        BaseType = baseType;
+        BaseTypeByte = baseType;
     }
 
-    public byte Number { get; init; }
-    public byte Size { get; init; }
-    public byte BaseType { get; init; }
+    public byte Number { get; private init; }
+    public byte Size { get; private init; }
+    public byte BaseTypeByte { get; private init; }
 
-    public bool EndianAbility => ((BaseType >> 7) & 1) == 1;
-    public int Reserved => ((BaseType >> 5) & 3);
-    public BaseType BaseTypeNumber => (BaseType)(BaseType & 15);
+    public bool EndianAbility => ((BaseTypeByte >> 7) & 1) == 1;
+    public int Reserved => ((BaseTypeByte >> 5) & 3);
+    public BaseType BaseType
+    {
+        get
+        {
+            var result = (BaseType)(BaseTypeByte & 15);
+            return result;
+        }
+    }
 }

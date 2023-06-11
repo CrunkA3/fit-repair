@@ -1,10 +1,31 @@
-﻿namespace fit_repair.lib;
+﻿using System.Collections.Concurrent;
+
+namespace fit_repair.lib;
 
 public class FitParser
 {
+    private const int HeaderWithCRCSize = 14;
+
+    #region  "Masks"
+    private const byte CompressedHeaderMask = 0x80;
+    private const byte CompressedTimeMask = 0x1F;
+    private const byte CompressedLocalMesgNumMask = 0x60;
+    private const byte MesgDefinitionMask = 0x40;
+    private const byte DevDataMask = 0x20;
+    private const byte LocalMesgNumMask = 0x0F;
+
+    #endregion
+
+
+
+
+    private uint _timeStamp = 0;
+    private uint _lastTimeOffset = 0;
+
     private readonly Stream _stream;
-    private readonly Dictionary<int, DefinitionMessage> _definitionMessages = new();
-    private readonly Dictionary<int, DataMessage> _dataMessages = new();
+
+    private readonly ConcurrentDictionary<byte, DefinitionMessage> _definitionMessages = new();
+    private readonly List<DataMessage> _dataMessages = new();
 
     private FitParser(Stream stream)
     {
@@ -16,8 +37,13 @@ public class FitParser
         return new FitParser(stream);
     }
 
+    public async Task Read()
+    {
+        await ReadHeaderAsync();
+        await ReadRecordsAsync();
+    }
 
-    public async Task<FitFileHeader> ReadHeaderAsync()
+    private async Task<FitFileHeader> ReadHeaderAsync()
     {
         _stream.Position = 0;
 
@@ -28,17 +54,17 @@ public class FitParser
         await _stream.ReadAsync(buff, 1, size - 1);
         FitFileHeader header = new(headerSize: buff[0],
                                    protocolVersion: buff[1],
-                                   profileVersion: BitConverter.ToInt16(buff.AsSpan().Slice(2, 2)),
-                                   dataSize: BitConverter.ToInt32(buff.AsSpan().Slice(4, 4)),
+                                   profileVersion: BitConverter.ToUInt16(buff.AsSpan().Slice(2, 2)),
+                                   dataSize: BitConverter.ToUInt32(buff.AsSpan().Slice(4, 4)),
                                    dataType: System.Text.ASCIIEncoding.ASCII.GetString(buff.AsSpan().Slice(8, 4)),
-                                   crc: BitConverter.ToInt16(buff.AsSpan().Slice(12, 2)));
+                                   crc: (size == HeaderWithCRCSize ? BitConverter.ToUInt16(buff.AsSpan().Slice(12, 2)) : (ushort)0));
 
         return header;
     }
 
-    public async Task ReadRecordsAsync()
+    private async Task ReadRecordsAsync()
     {
-        while (_stream.Position < _stream.Length)
+        while (_stream.Position < _stream.Length - 2)
         {
             await ReadRecordAsync();
         }
@@ -48,26 +74,25 @@ public class FitParser
     {
         var headerByte = _stream.ReadByte();
 
-        var normalHeader = ((headerByte >> 7) & 1) == 0;
+        var isCompressedHeader = (headerByte & CompressedHeaderMask) == CompressedHeaderMask;
         var isDeveloper = false;
         var isDefinitionMessage = false;
-        int localMessageType;
+        byte localMessageType;
         int timeOffset = 0; //offset in seconds
 
 
-        if (normalHeader)
+        if (isCompressedHeader)
         {
-            isDefinitionMessage = (headerByte & (1 << 6)) != 0;
-            isDeveloper = ((headerByte >> 5) & 1) != 0;
-
-            // 0 = Record
-            // 1 = Lap
-            localMessageType = (headerByte >> 1) & 1;
+            timeOffset = headerByte & CompressedTimeMask;
+            _timeStamp += (uint)(timeOffset - _lastTimeOffset) & CompressedTimeMask;
+            localMessageType = (byte)((headerByte & CompressedLocalMesgNumMask) >> 5);
         }
         else
         {
-            localMessageType = (headerByte >> 1) & 3;
-            timeOffset = (headerByte >> 0) & 15;
+            isDefinitionMessage = (headerByte & MesgDefinitionMask) == MesgDefinitionMask;
+            isDeveloper = (headerByte & DevDataMask) == DevDataMask;
+
+            localMessageType = (byte)(headerByte & LocalMesgNumMask);
         }
 
         if (isDefinitionMessage)
@@ -76,32 +101,30 @@ public class FitParser
         }
         else
         {
-            await ReadDataMessageAsync(localMessageType);
+            await ReadDataMessageAsync(localMessageType, isCompressedHeader);
         }
     }
 
-    private async Task ReadDefinitionMessageAsync(int localMessageType, bool isDeveloper)
+    private async Task ReadDefinitionMessageAsync(byte localMessageType, bool isDeveloper)
     {
         var buff = new byte[5];
         await _stream.ReadExactlyAsync(buff, 0, buff.Length);
 
         var reserved = buff[0];
         var architecture = (Architecture)buff[1];
-        var globalMessageNumber = BitConverter.ToUInt16(buff.AsSpan());
+        var globalMessageNumber = BitConverter.ToUInt16(buff.AsSpan().Slice(2, 2));
         var fieldCount = buff[4];
 
-        var fieldsBuff = new byte[fieldCount * 3];
-        await _stream.ReadExactlyAsync(fieldsBuff, 0, fieldsBuff.Length);
-
-        var fieldDefinition = new FieldDefinition[fieldCount];
+        var fieldDefinitions = new FieldDefinition[fieldCount];
         for (int i = 0; i < fieldCount; i++)
         {
             var fieldBuff = new byte[3];
             await _stream.ReadExactlyAsync(fieldBuff, 0, fieldBuff.Length);
-            fieldDefinition[i] = new FieldDefinition(number: fieldBuff[0],
+            fieldDefinitions[i] = new FieldDefinition(number: fieldBuff[0],
                                                      size: fieldBuff[1],
                                                      baseType: fieldBuff[2]);
         }
+        //fieldDefinitions = fieldDefinitions.OrderBy(m => m.Number).ToArray();
 
 
         var developerFieldCount = 0;
@@ -110,9 +133,6 @@ public class FitParser
         {
             developerFieldCount = _stream.ReadByte();
             developerFieldDefinitions = new DeveloperFieldDefinition[developerFieldCount];
-
-            var devFieldsBuff = new byte[developerFieldCount * 3];
-            await _stream.ReadExactlyAsync(devFieldsBuff, 0, devFieldsBuff.Length);
 
             for (int i = 0; i < developerFieldCount; i++)
             {
@@ -124,16 +144,27 @@ public class FitParser
             }
         }
 
-        DefinitionMessage definitionMessage = new(reserved, architecture, globalMessageNumber, fieldCount, developerFieldCount, fieldDefinition, developerFieldDefinitions);
+        DefinitionMessage definitionMessage = new(reserved, architecture, globalMessageNumber, fieldCount, developerFieldCount, fieldDefinitions, developerFieldDefinitions);
         Console.WriteLine(definitionMessage.GlobalMessageNumber);
 
-        _definitionMessages.Add(localMessageType, definitionMessage);
+        _definitionMessages.AddOrUpdate(localMessageType, definitionMessage, (k, v) => definitionMessage);
+
+        for (int i = 0; i < definitionMessage.FieldCount; i++)
+        {
+            FieldDefinition fieldDefinition = definitionMessage.FieldDefinitions.OrderBy(m => m.Number).ElementAt(i);
+        }
+        for (int i = 0; i < definitionMessage.DeveloperFieldCount; i++)
+        {
+            DeveloperFieldDefinition developerFieldDefinition = definitionMessage.DeveloperFieldDefinitions.OrderBy(m => m.Number).ElementAt(i);
+        }
     }
 
-    private async Task ReadDataMessageAsync(int localMessageType)
+    private async Task ReadDataMessageAsync(byte localMessageType, bool isCompressedHeader)
     {
         if (!_definitionMessages.TryGetValue(localMessageType, out DefinitionMessage? definitionMessage))
             throw new Exception(string.Format("Definition message for message type {0} not found", localMessageType));
+
+        var dataMessage = new DataMessage(localMessageType);
 
         for (int i = 0; i < definitionMessage.FieldCount; i++)
         {
@@ -142,12 +173,12 @@ public class FitParser
             await _stream.ReadExactlyAsync(buff, 0, buff.Length);
             if (definitionMessage.Architecture == Architecture.BigEndian) buff = buff.Reverse().ToArray();
 
-            //TODO: Save data
+            dataMessage.AddDataField(new DataField(field, buff));
         }
 
         if (definitionMessage.DeveloperFieldCount > 0 && definitionMessage.DeveloperFieldDefinitions != null)
         {
-            for (int i = 0; i < definitionMessage.FieldCount; i++)
+            for (int i = 0; i < definitionMessage.DeveloperFieldCount; i++)
             {
                 var field = definitionMessage.DeveloperFieldDefinitions[i];
                 var buff = new byte[field.Size];
@@ -155,7 +186,9 @@ public class FitParser
                 if (definitionMessage.Architecture == Architecture.BigEndian) buff = buff.Reverse().ToArray();
 
                 //TODO: Save data
+                dataMessage.AddDeveloperDataField(null);
             }
         }
+        _dataMessages.Add(dataMessage);
     }
 }
