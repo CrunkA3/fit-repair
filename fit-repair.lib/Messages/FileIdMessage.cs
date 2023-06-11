@@ -51,7 +51,7 @@ public class FileIdMessage : DataMessage
     public uint? GetSerialNumber() => GetValueOrDefaultUint(FileIdMessageFieldNumber.SerialNumber);
     public DateTime? GetTimeCreated() => GetValueOrDefaultDateTime(FileIdMessageFieldNumber.TimeCreated);
     public ushort? GetNumber() => GetValueOrDefaultUshort(FileIdMessageFieldNumber.Number);
-    public string? GetProductName() => GetValueString(FileIdMessageFieldNumber.ProductName);
+    public string? GetProductName() => GetValueOrDefaultString(FileIdMessageFieldNumber.ProductName);
 
 
 }

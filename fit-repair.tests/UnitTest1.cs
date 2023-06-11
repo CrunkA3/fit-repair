@@ -17,6 +17,8 @@ public class UnitTest1
         Assert.Equal((ushort)255, fileIdMessage.GetManufacturer());
         Assert.Equal((ushort)0, fileIdMessage.GetProduct());
         Assert.Equal(new DateTime(995749880, DateTimeKind.Utc), fileIdMessage.GetTimeCreated());
-        Assert.Equal((uint)1457061125, fileIdMessage.GetSerialNumber());
+        Assert.Equal((uint?)1457061125, fileIdMessage.GetSerialNumber());
+        Assert.Null(fileIdMessage.GetProductName());
+
     }
 }

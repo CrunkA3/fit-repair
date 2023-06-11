@@ -11,6 +11,6 @@ public abstract class FieldNumberDefinitions<T> where T : notnull
     }
     private readonly T _value;
 
-    public static implicit operator T(FieldNumberDefinitions<T> value) => ((T)value);
+    public static implicit operator T(FieldNumberDefinitions<T> value) => value._value;
     public static implicit operator FieldNumberDefinitions<T>(T value) => Values[value];
 }
