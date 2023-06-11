@@ -1,3 +1,5 @@
+namespace FitRepair;
+
 public enum Architecture
 {
     LittleEndian = 0,

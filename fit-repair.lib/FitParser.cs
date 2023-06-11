@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace fit_repair.lib;
+namespace FitRepair;
 
 public class FitParser
 {
@@ -37,10 +37,12 @@ public class FitParser
         return new FitParser(stream);
     }
 
-    public async Task Read()
+    public async Task<FitFile> Read()
     {
-        await ReadHeaderAsync();
+        var header = await ReadHeaderAsync();
         await ReadRecordsAsync();
+
+        return new FitFile(header, _dataMessages);
     }
 
     private async Task<FitFileHeader> ReadHeaderAsync()
@@ -155,7 +157,7 @@ public class FitParser
         if (!_definitionMessages.TryGetValue(localMessageType, out DefinitionMessage? definitionMessage))
             throw new Exception(string.Format("Definition message for message type {0} not found", localMessageType));
 
-        var dataMessage = new DataMessage(localMessageType);
+        var dataMessage = CreateDataMessage(localMessageType, definitionMessage);
 
         for (int i = 0; i < definitionMessage.FieldCount; i++)
         {
@@ -180,5 +182,16 @@ public class FitParser
             }
         }
         _dataMessages.Add(dataMessage);
+    }
+
+
+
+    private DataMessage CreateDataMessage(byte localMessageType, DefinitionMessage definitionMessage)
+    {
+        return (MessageNumber)definitionMessage.GlobalMessageNumber switch
+        {
+            MessageNumber.FileId => new FileIdMessage(localMessageType),
+            _ => new DataMessage(localMessageType),
+        };
     }
 }

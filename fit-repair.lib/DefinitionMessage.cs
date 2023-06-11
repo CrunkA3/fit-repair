@@ -1,3 +1,5 @@
+namespace FitRepair;
+
 public class DefinitionMessage
 {
     internal DefinitionMessage(int reserved,

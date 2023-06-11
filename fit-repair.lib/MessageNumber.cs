@@ -1,3 +1,5 @@
+namespace FitRepair;
+
 public enum MessageNumber
 {
     FileId = 0,

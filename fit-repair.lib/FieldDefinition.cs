@@ -1,3 +1,5 @@
+namespace FitRepair;
+
 public class FieldDefinition
 {
     internal FieldDefinition(byte number, byte size, byte baseType)

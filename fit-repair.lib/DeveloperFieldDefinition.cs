@@ -1,3 +1,5 @@
+namespace FitRepair;
+
 public class DeveloperFieldDefinition
 {
     internal DeveloperFieldDefinition(byte number, byte size, byte developerDataIndex)

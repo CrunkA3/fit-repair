@@ -1,3 +1,5 @@
+namespace FitRepair;
+
 public class DeveloperDataField
 {
     internal DeveloperDataField(DeveloperFieldDefinition developerFieldDefinition, byte[] contentBytes)

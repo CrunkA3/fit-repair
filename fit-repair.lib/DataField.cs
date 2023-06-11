@@ -1,9 +1,17 @@
+namespace FitRepair;
+
 public class DataField
 {
     internal DataField(FieldDefinition fieldDefinition, byte[] contentBytes)
     {
         FieldDefinition = fieldDefinition;
         ContentBytes = contentBytes;
+    }
+
+    internal DataField()
+    {
+        FieldDefinition = new FieldDefinition(0, 0, 0);
+        ContentBytes = new byte[0];
     }
 
     public FieldDefinition FieldDefinition { get; private init; }

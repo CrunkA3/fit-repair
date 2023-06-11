@@ -1,3 +1,5 @@
+namespace FitRepair;
+
 public enum BaseType
 {
     EnumBaseType = 0,
