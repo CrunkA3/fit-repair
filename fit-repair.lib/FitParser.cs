@@ -148,15 +148,6 @@ public class FitParser
         Console.WriteLine(definitionMessage.GlobalMessageNumber);
 
         _definitionMessages.AddOrUpdate(localMessageType, definitionMessage, (k, v) => definitionMessage);
-
-        for (int i = 0; i < definitionMessage.FieldCount; i++)
-        {
-            FieldDefinition fieldDefinition = definitionMessage.FieldDefinitions.OrderBy(m => m.Number).ElementAt(i);
-        }
-        for (int i = 0; i < definitionMessage.DeveloperFieldCount; i++)
-        {
-            DeveloperFieldDefinition developerFieldDefinition = definitionMessage.DeveloperFieldDefinitions.OrderBy(m => m.Number).ElementAt(i);
-        }
     }
 
     private async Task ReadDataMessageAsync(byte localMessageType, bool isCompressedHeader)
@@ -185,8 +176,7 @@ public class FitParser
                 await _stream.ReadExactlyAsync(buff, 0, buff.Length);
                 if (definitionMessage.Architecture == Architecture.BigEndian) buff = buff.Reverse().ToArray();
 
-                //TODO: Save data
-                dataMessage.AddDeveloperDataField(null);
+                dataMessage.AddDeveloperDataField(new DeveloperDataField(field, buff));
             }
         }
         _dataMessages.Add(dataMessage);

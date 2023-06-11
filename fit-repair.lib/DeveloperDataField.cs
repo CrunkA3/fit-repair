@@ -1,15 +1,15 @@
-public class DataField
+public class DeveloperDataField
 {
-    internal DataField(FieldDefinition fieldDefinition, byte[] contentBytes)
+    internal DeveloperDataField(DeveloperFieldDefinition developerFieldDefinition, byte[] contentBytes)
     {
-        FieldDefinition = fieldDefinition;
+        DeveloperFieldDefinition = developerFieldDefinition;
         ContentBytes = contentBytes;
     }
 
-    public FieldDefinition FieldDefinition { get; private init; }
+    public DeveloperFieldDefinition DeveloperFieldDefinition { get; private init; }
     public byte[] ContentBytes { get; init; }
 
-    public override string ToString()
+    /*public override string ToString()
     {
         switch (FieldDefinition.BaseType)
         {
@@ -32,5 +32,5 @@ public class DataField
 
             default: return BitConverter.ToString(ContentBytes);
         }
-    }
+    }*/
 }
