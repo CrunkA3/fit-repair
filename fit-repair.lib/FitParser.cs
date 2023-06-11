@@ -193,6 +193,7 @@ public class FitParser
             MessageNumber.FileId => new FileIdMessage(localMessageType),
             MessageNumber.FileCreator => new FileCreatorMessage(localMessageType),
             MessageNumber.TimestampCorrelation => new TimestampCorrelationMessage(localMessageType),
+            MessageNumber.Software => new SoftwareMessage(localMessageType),
             _ => new DataMessage(localMessageType),
         };
     }
