@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "c+YttETJl6D37iBmFu/u6z7WKE/qDUCSvwO6oclyeZn6lpq0V+azUtqn00gj9aiTJwlx+qDpcAqkH/xeZh8kUg==",
+  "dgSpecHash": "QTI/gbGQLhefVZ1urOkR9+wrkus6hc4yuv2qViqeelOuyB0XGghhjNVc4SnP2BaDmUodntJTK2hkPWqSBy+8zA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.tests\\fit-repair.tests.csproj",
+  "projectFilePath": "c:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.tests\\fit-repair.tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\micha\\.nuget\\packages\\coverlet.collector\\3.2.0\\coverlet.collector.3.2.0.nupkg.sha512",
     "C:\\Users\\micha\\.nuget\\packages\\microsoft.codecoverage\\17.5.0\\microsoft.codecoverage.17.5.0.nupkg.sha512",

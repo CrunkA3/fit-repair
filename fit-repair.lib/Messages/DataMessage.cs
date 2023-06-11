@@ -43,6 +43,21 @@ public class DataMessage
 
     }
 
+    public byte GetValueByte(byte fieldNumber)
+    {
+        return GetDataField(fieldNumber).ContentBytes[0];
+    }
+    public byte? GetValueOrDefaultByte(byte fieldNumber)
+    {
+        try
+        {
+            return GetValueByte(fieldNumber);
+        }
+        catch (Exception)
+        {
+            return default;
+        }
+    }
 
     public ushort GetValueUshort(byte fieldNumber)
     {
@@ -60,6 +75,23 @@ public class DataMessage
         }
     }
 
+
+
+    public float GetValueFloat(byte fieldNumber)
+    {
+        return BitConverter.ToSingle(GetDataField(fieldNumber).ContentBytes);
+    }
+    public float? GetValueOrDefaultFloat(byte fieldNumber)
+    {
+        try
+        {
+            return GetValueFloat(fieldNumber);
+        }
+        catch (Exception)
+        {
+            return default;
+        }
+    }
 
     public uint GetValueUint(byte fieldNumber)
     {

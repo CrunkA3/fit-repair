@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using fit_repair.lib.Messages;
+using System.Collections.Concurrent;
 
 namespace FitRepair;
 
@@ -191,6 +192,8 @@ public class FitParser
         return (MessageNumber)definitionMessage.GlobalMessageNumber switch
         {
             MessageNumber.FileId => new FileIdMessage(localMessageType),
+            MessageNumber.FileCreator => new FileCreatorMessage(localMessageType),
+            MessageNumber.TimestampCorrelation => new TimestampCorrelationMessage(localMessageType),
             _ => new DataMessage(localMessageType),
         };
     }

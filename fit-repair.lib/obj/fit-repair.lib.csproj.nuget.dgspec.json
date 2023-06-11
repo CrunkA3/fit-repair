@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\fit-repair.lib.csproj": {}
+    "c:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\fit-repair.lib.csproj": {}
   },
   "projects": {
-    "C:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\fit-repair.lib.csproj": {
+    "c:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\fit-repair.lib.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\fit-repair.lib.csproj",
+        "projectUniqueName": "c:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\fit-repair.lib.csproj",
         "projectName": "fit-repair.lib",
-        "projectPath": "C:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\fit-repair.lib.csproj",
+        "projectPath": "c:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\fit-repair.lib.csproj",
         "packagesPath": "C:\\Users\\micha\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\obj\\",
+        "outputPath": "c:\\Users\\micha\\source\\repos\\CrunkA3\\fit-repair\\fit-repair.lib\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\micha\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -36,7 +36,7 @@ public sealed class FileIdMessageProductSubfieldNumber : FieldNumberDefinitions<
 
 
 
-public class FileIdMessage : DataMessage
+public sealed class FileIdMessage : DataMessage
 {
     internal FileIdMessage(int localMessageType) : base(localMessageType) { }
 
