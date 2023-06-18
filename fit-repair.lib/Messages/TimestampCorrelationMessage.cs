@@ -30,7 +30,7 @@ public sealed class TimestampCorrelationMessage : DataMessage
     public float? GetFractionalTimestamp() => GetValueOrDefaultFloat(TimestampCorrelationMessageFieldNumber.FractionalTimestamp);
     public DateTime? GetSystemTimestamp() => GetValueOrDefaultDateTime(TimestampCorrelationMessageFieldNumber.SystemTimestamp);
     public float? GetFractionalSystemTimestamp() => GetValueOrDefaultFloat(TimestampCorrelationMessageFieldNumber.FractionalSystemTimestamp);
-    public uint? GetLocalTimestamp() => GetValueOrDefaultUint(TimestampCorrelationMessageFieldNumber.LocalTimestamp);
+    public DateTime? GetLocalTimestamp() => GetValueOrDefaultDateTime(TimestampCorrelationMessageFieldNumber.LocalTimestamp, DateTimeKind.Local);
     public ushort? GetTimestampMs() => GetValueOrDefaultUshort(TimestampCorrelationMessageFieldNumber.TimestampMs);
     public ushort? GetSystemTimestampMs() => GetValueOrDefaultUshort(TimestampCorrelationMessageFieldNumber.SystemTimestampMs);
 
