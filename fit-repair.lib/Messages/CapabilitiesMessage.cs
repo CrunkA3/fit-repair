@@ -1,4 +1,4 @@
-using FitRepair.Sports;
+using FitRepair.Flags;
 
 namespace FitRepair;
 
@@ -27,9 +27,7 @@ public sealed class CapabilitiesMessage : DataMessage
 
     public ushort? GetLanguages() => GetValueOrDefaultUshort(CapabilitiesFieldNumber.Languages);
     public IReadOnlyCollection<Sport> GetSports() => GetValueOrDefaultSports(CapabilitiesFieldNumber.Sports);
-    public ushort? GetWorkoutsSupported() => GetValueOrDefaultUshort(CapabilitiesFieldNumber.WorkoutsSupported);
-    public ushort? GetConnectivitySupported() => GetValueOrDefaultUshort(CapabilitiesFieldNumber.ConnectivitySupported);
-
-
+    public WorkoutCapabilitie? GetWorkoutsSupported() => (WorkoutCapabilitie?)GetValueOrDefaultUshort(CapabilitiesFieldNumber.WorkoutsSupported);
+    public ConnectivityCapabilitie? GetConnectivitySupported() => (ConnectivityCapabilitie?)GetValueOrDefaultUshort(CapabilitiesFieldNumber.ConnectivitySupported);
 
 }

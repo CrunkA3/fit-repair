@@ -1,8 +1,8 @@
 namespace FitRepair;
 
-public abstract class FieldNumberDefinitions<T> where T : notnull
+public class FieldNumberDefinitions<T> where T : notnull
 {
-    public static readonly SortedList<T, FieldNumberDefinitions<T>> Values = new SortedList<T, FieldNumberDefinitions<T>>();
+    public static readonly SortedList<T, FieldNumberDefinitions<T>> Values = new();
 
     internal FieldNumberDefinitions(T value)
     {

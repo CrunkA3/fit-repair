@@ -186,7 +186,7 @@ public class FitParser
 
 
 
-    private DataMessage CreateDataMessage(byte localMessageType, DefinitionMessage definitionMessage)
+    private static DataMessage CreateDataMessage(byte localMessageType, DefinitionMessage definitionMessage)
     {
         return (MessageNumber)definitionMessage.GlobalMessageNumber switch
         {
@@ -195,6 +195,7 @@ public class FitParser
             MessageNumber.TimestampCorrelation => new TimestampCorrelationMessage(localMessageType),
             MessageNumber.Software => new SoftwareMessage(localMessageType),
             MessageNumber.SlaveDevice => new SlaveDeviceMessage(localMessageType),
+            MessageNumber.Capabilities => new CapabilitiesMessage(localMessageType),
             _ => new DataMessage(localMessageType),
         };
     }
