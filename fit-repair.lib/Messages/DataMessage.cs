@@ -1,6 +1,5 @@
 using FitRepair.Extensions;
 using FitRepair.Flags;
-using FitRepair.Sports;
 using System.Collections.ObjectModel;
 using System.Text;
 
@@ -92,6 +91,22 @@ public class DataMessage
         try
         {
             return GetValueUshort(fieldNumber);
+        }
+        catch (Exception)
+        {
+            return default;
+        }
+    }
+
+    public short GetValueShort(byte fieldNumber)
+    {
+        return BitConverter.ToInt16(GetDataField(fieldNumber).ContentBytes);
+    }
+    public short? GetValueOrDefaultShort(byte fieldNumber)
+    {
+        try
+        {
+            return GetValueShort(fieldNumber);
         }
         catch (Exception)
         {
