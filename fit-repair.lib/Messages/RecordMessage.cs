@@ -7,17 +7,17 @@ namespace FitRepair;
 /// </summary>
 public sealed class RecordFieldNumber : FieldNumberDefinitions<byte>
 {
-    public static readonly RecordFieldNumber Timestamp = new(253);
-    public static readonly RecordFieldNumber PositionLat = new(0);
-    public static readonly RecordFieldNumber PositionLong = new(1);
-    public static readonly RecordFieldNumber Altitude = new(2);
-    public static readonly RecordFieldNumber HeartRate = new(3);
-    public static readonly RecordFieldNumber Cadence = new(4);
-    public static readonly RecordFieldNumber Distance = new(5);
-    public static readonly RecordFieldNumber Speed = new(6);
-    public static readonly RecordFieldNumber Power = new(7);
+    public static readonly RecordFieldNumber Timestamp = new(253, "s");
+    public static readonly RecordFieldNumber PositionLat = new(0, "semicircles");
+    public static readonly RecordFieldNumber PositionLong = new(1, "semicircles");
+    public static readonly RecordFieldNumber Altitude = new(2, "m");
+    public static readonly RecordFieldNumber HeartRate = new(3, "bpm");
+    public static readonly RecordFieldNumber Cadence = new(4, "rpm");
+    public static readonly RecordFieldNumber Distance = new(5, "m");
+    public static readonly RecordFieldNumber Speed = new(6, "m/s");
+    public static readonly RecordFieldNumber Power = new(7, "watts");
     public static readonly RecordFieldNumber CompressedSpeedDistance = new(8);
-    public static readonly RecordFieldNumber Grade = new(9);
+    public static readonly RecordFieldNumber Grade = new(9, "%");
     public static readonly RecordFieldNumber Resistance = new(10);
     public static readonly RecordFieldNumber TimeFromCourse = new(11);
     public static readonly RecordFieldNumber CycleLength = new(12);
@@ -92,6 +92,7 @@ public sealed class RecordFieldNumber : FieldNumberDefinitions<byte>
 
 
     private RecordFieldNumber(byte value) : base(value) { }
+    private RecordFieldNumber(byte value, string unit) : base(value, unit) { }
 
 }
 
@@ -105,6 +106,15 @@ public sealed class RecordMessage : DataMessage
 
 
     public DateTime? GetTimestamp() => GetValueOrDefaultDateTime(RecordFieldNumber.Timestamp);
-    public short? GetPositionLat() => GetValueOrDefaultShort(RecordFieldNumber.PositionLat);
+    public int? GetPositionLat() => GetValueOrDefaultInt(RecordFieldNumber.PositionLat);
+    public int? GetPositionLong() => GetValueOrDefaultInt(RecordFieldNumber.PositionLong);
+    public float? GetAltitude() => GetValueOrDefaultUshort(RecordFieldNumber.Altitude) / 5f + 500;
+
+    public byte? GetHeartRate() => GetValueOrDefaultByte(RecordFieldNumber.HeartRate);
+    public byte? GetCadence() => GetValueOrDefaultByte(RecordFieldNumber.Cadence);
+    public uint? GetDistance() => GetValueOrDefaultUint(RecordFieldNumber.Distance);
+
+    public float? GetSpeed() => GetValueOrDefaultUshort(RecordFieldNumber.Speed) / 1000f;
+    public float? GetPower() => GetValueOrDefaultUshort(RecordFieldNumber.Power);
 
 }

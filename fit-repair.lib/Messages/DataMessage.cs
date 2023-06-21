@@ -148,6 +148,22 @@ public class DataMessage
         }
     }
 
+    public int GetValueInt(byte fieldNumber)
+    {
+        return BitConverter.ToInt32(GetDataField(fieldNumber).ContentBytes);
+    }
+    public int? GetValueOrDefaultInt(byte fieldNumber)
+    {
+        try
+        {
+            return GetValueInt(fieldNumber);
+        }
+        catch (Exception)
+        {
+            return default;
+        }
+    }
+
     public DateTime GetValueDateTime(byte fieldNumber, DateTimeKind dateTimeKind)
     {
         return new DateTime(GetValueUint(fieldNumber), dateTimeKind);
